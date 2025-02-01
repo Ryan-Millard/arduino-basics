@@ -1,9 +1,9 @@
 #include <Inkplate.h>
 #include "WiFiHelper.h"
-
 #define BAUD_RATE 115200
 #define WIFI_SSID "D-Link-2.4G"
 #define WIFI_PASSWORD "51543BED9AD4344C156A"
+#define UPDATE_INTERVAL 60000  // 60 seconds in milliseconds
 
 Inkplate display;
 WiFiHelper wifiHelper(WIFI_SSID, WIFI_PASSWORD);
@@ -19,28 +19,29 @@ void setup()
 
 	// Attempt WiFi connection
 	Serial.println("Connecting to WiFi...");
-	if(wifiHelper.connect())
-	{
-		Serial.println("WiFi connected successfully");
-		wifiHelper.setTime();
-	} else
+	if(!wifiHelper.connect())
 	{
 		Serial.println("WiFi connection failed");
+		return;
 	}
+	Serial.println("WiFi connected successfully");
+	wifiHelper.setTime();
 }
 
 void loop()
 {
-	// Attempt reconnection if disconnected
-	if(!wifiHelper.isConnected())
-	{
-		Serial.println("WiFi disconnected, attempting reconnection...");
-		if(!wifiHelper.connect())
-		{
-			delay(5000);  // Wait before retrying
-			return;
-		}
-	}
+	static unsigned long lastUpdate = 0;
 
-	wifiHelper.updateDisplay(display);
+	// Check if it's time for an update
+	if(millis() - lastUpdate >= UPDATE_INTERVAL)
+	{
+		if(!wifiHelper.isConnected())
+		{
+			Serial.println("WiFi disconnected, attempting reconnection...");
+			wifiHelper.connect();
+		}
+
+		wifiHelper.updateDisplay(display);
+		lastUpdate = currentMillis;
+	}
 }
