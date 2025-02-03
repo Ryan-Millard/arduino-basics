@@ -60,15 +60,19 @@ void setup()
 
 	// Fetch and display flight status and pricing data
 	fetchFlightStatus();
+	delay(10000); // 10 second delay to allow user to read it
 	fetchFlightPricing(amadeusAccessToken);
+	delay(10000); // 10 second delay to allow user to read it
 }
 
 void loop()
 {
 	// Fetch and update every 60 seconds
-	delay(60000);
+	delay(40000); // Wait 50 seconds before next fetch
 	fetchFlightStatus();
+	delay(10000); // 10 second delay to allow user to read it
 	fetchFlightPricing(amadeusAccessToken);
+	delay(10000); // 10 second delay to allow user to read it
 }
 
 // Function to fetch and display flight status from AviationStack API
